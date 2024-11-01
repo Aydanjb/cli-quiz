@@ -36,6 +36,8 @@ go.work.sum
 .idea/**/dictionaries
 .idea/**/shelf
 
+.idea/**
+
 # AWS User-specific
 .idea/**/aws.xml
 
