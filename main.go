@@ -5,7 +5,9 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"math/rand"
 	"os"
+	"strings"
 )
 
 // OpenFile takes in a path to a file and returns a pointer to the open file
@@ -34,6 +36,7 @@ func ReadCsv(file *os.File) ([][]string, error) {
 
 func main() {
 	filePtr := flag.String("f", "problems.csv", "Path to CSV file")
+	shufflePtr := flag.Bool("s", false, "Shuffle output")
 
 	flag.Parse()
 
@@ -49,6 +52,14 @@ func main() {
 		panic(err)
 	}
 
+	// Shuffle problems
+	if *shufflePtr {
+		for i := range problems {
+			j := rand.Intn(i + 1)
+			problems[i], problems[j] = problems[j], problems[i]
+		}
+	}
+
 	correct := 0
 	incorrect := 0
 	for i, problem := range problems {
@@ -58,6 +69,7 @@ func main() {
 
 		// Get answers
 		fmt.Scanln(&answer)
+		answer = strings.TrimSpace(answer)
 
 		// Keep track of correct and incorrect answers
 		if answer == problem[1] {
