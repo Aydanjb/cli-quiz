@@ -7,20 +7,39 @@ import (
 	"os"
 )
 
-func main() {
-	file, err := os.Open("problems.csv")
+func openFile(path string) (*os.File, error) {
+	file, err := os.Open(path)
 	if err != nil {
 		log.Fatalf("Failed to open file: %s\n", file.Name())
+		return nil, err
+	}
+
+	return file, nil
+}
+
+func readCsv(file *os.File) ([][]string, error) {
+	csvReader := csv.NewReader(file)
+	data, err := csvReader.ReadAll()
+	if err != nil {
+		log.Fatalf("Failed to parse file: %s\n", file.Name())
+		return nil, err
 	}
 	defer file.Close()
 
-	csvReader := csv.NewReader(file)
-	problems, err := csvReader.ReadAll()
+	return data, nil
+}
+
+func main() {
+
+	file, err := openFile("problems.csv")
 	if err != nil {
-		log.Fatalf("Failed to parse file: %s\n", file.Name())
+		panic(err)
 	}
 
-	fmt.Println(problems)
+	problems, err := readCsv(file)
+	if err != nil {
+		panic(err)
+	}
 
 	for i, problem := range problems {
 		fmt.Printf("Problem #%d: %s\n", i+1, problem[0])
