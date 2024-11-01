@@ -2,12 +2,14 @@ package main
 
 import (
 	"encoding/csv"
+	"flag"
 	"fmt"
 	"log"
 	"os"
 )
 
-func openFile(path string) (*os.File, error) {
+// OpenFile takes in a path to a file and returns a pointer to the open file
+func OpenFile(path string) (*os.File, error) {
 	file, err := os.Open(path)
 	if err != nil {
 		log.Fatalf("Failed to open file: %s\n", file.Name())
@@ -17,7 +19,8 @@ func openFile(path string) (*os.File, error) {
 	return file, nil
 }
 
-func readCsv(file *os.File) ([][]string, error) {
+// ReadCsv takes in a pointer to a open file and returns a 2D slice of CSV data
+func ReadCsv(file *os.File) ([][]string, error) {
 	csvReader := csv.NewReader(file)
 	data, err := csvReader.ReadAll()
 	if err != nil {
@@ -30,19 +33,40 @@ func readCsv(file *os.File) ([][]string, error) {
 }
 
 func main() {
+	filePtr := flag.String("f", "problems.csv", "Path to CSV file")
 
-	file, err := openFile("problems.csv")
+	flag.Parse()
+
+	// Open quiz problems
+	file, err := OpenFile(*filePtr)
 	if err != nil {
 		panic(err)
 	}
 
-	problems, err := readCsv(file)
+	// Parse CSV
+	problems, err := ReadCsv(file)
 	if err != nil {
 		panic(err)
 	}
 
+	correct := 0
+	incorrect := 0
 	for i, problem := range problems {
+		var answer string
+		// Display problems
 		fmt.Printf("Problem #%d: %s\n", i+1, problem[0])
-		fmt.Printf("Answer: %s\n", problem[1])
+
+		// Get answers
+		fmt.Scanln(&answer)
+
+		// Keep track of correct and incorrect answers
+		if answer == problem[1] {
+			correct++
+		} else {
+			incorrect++
+		}
 	}
+
+	// Display # of correct/incorrect answers
+	fmt.Printf("%d correct, %d incorrect\n", correct, incorrect)
 }
